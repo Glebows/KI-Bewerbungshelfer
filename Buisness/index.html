@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI Bewerbungshelfer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dein KI-Bewerbungshelfer 🤖</h1>
+            <p>Erstelle in Sekunden professionelle Bewerbungsunterlagen.</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <section class="card">
+                    <h2>Schritt 1: Deine Daten</h2>
+                    <label for="user-name">Dein voller Name</label>
+                    <input type="text" id="user-name" placeholder="Max Mustermann">
+                    <label for="user-address">Straße & Hausnummer</label>
+                    <input type="text" id="user-address" placeholder="Musterstraße 1">
+                    <label for="user-city">PLZ & Stadt</label>
+                    <input type="text" id="user-city" placeholder="12345 Musterstadt">
+                    <label for="user-email">E-Mail</label>
+                    <input type="email" id="user-email" placeholder="max.mustermann@email.de">
+                    <label for="user-phone">Telefon (optional)</label>
+                    <input type="tel" id="user-phone" placeholder="0123 4567890">
+                </section>
+                
+                <section class="card">
+                    <h2>Schritt 2: Empfänger</h2>
+                    <label for="company-name">Firma</label>
+                    <input type="text" id="company-name" placeholder="Digital Forward GmbH">
+                    <label for="company-address">Straße & Hausnummer</label>
+                    <input type="text" id="company-address" placeholder="Innovationsallee 42">
+                    <label for="company-city">PLZ & Stadt</label>
+                    <input type="text" id="company-city" placeholder="10115 Berlin">
+                </section>
+                
+                <section class="card">
+                    <h2>Schritt 3: Über dich (fürs Anschreiben)</h2>
+                    <label for="user-skills">Deine Fähigkeiten & Kenntnisse:</label>
+                    <textarea id="user-skills" rows="3" placeholder="Stichpunkte genügen..."></textarea>
+                    
+                    <label for="user-experience">Deine Erfahrungen:</label>
+                    <textarea id="user-experience" rows="3" placeholder="Was hast du schon gemacht?"></textarea>
+                </section>
+
+                <section class="card">
+                    <h2>Schritt 4: Die Stelle</h2>
+                    <label for="job-description">Kopiere hier die Stellenanzeige hinein:</label>
+                    <textarea id="job-description" rows="5" placeholder="..."></textarea>
+                </section>
+
+                <section class="card cv-section">
+                    <h2>Schritt 5: Dein Lebenslauf</h2>
+                    <label for="cv-photo">Bewerbungsfoto (optional)</label>
+                    <input type="file" id="cv-photo" accept="image/png, image/jpeg">
+
+                    <label for="cv-education">Schulbildung:</label>
+                    <textarea id="cv-education" rows="3" placeholder="z.B. 2023 - heute: Schul- und Leistungssportzentrum Berlin..."></textarea>
+                    <label for="cv-skills">Interessen & Kenntnisse:</label>
+                    <textarea id="cv-skills" rows="3" placeholder="z.B. Sprachen: Englisch, Spanisch..."></textarea>
+                    <label for="cv-hobbies">Hobbys & Engagement:</label>
+                    <textarea id="cv-hobbies" rows="3" placeholder="z.B. Sport, Lesen (Medizin)..."></textarea>
+                </section>
+            </div>
+
+            <div class="action-section">
+                <button id="generate-btn"><i class="fas fa-magic"></i> Unterlagen generieren</button>
+            </div>
+
+            <div class="output-section">
+                <section class="card result-card">
+                    <h2>Ergebnis: Anschreiben-Text</h2>
+                    <div id="result-text" class="result-text" contenteditable="true" spellcheck="false">
+                        <p class="placeholder">Dein Anschreiben wird hier erscheinen...</p>
+                    </div>
+                    <div class="result-actions">
+                        <button id="copy-btn" title="Text kopieren"><i class="fas fa-copy"></i></button>
+                        <button id="download-pdf-btn" class="hidden"><i class="fas fa-file-pdf"></i> PDF herunterladen</button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
