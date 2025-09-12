@@ -30,7 +30,6 @@ generateBtn.addEventListener('click', async () => {
       cvEducation, cvSkills, cvHobbies
   ];
   
-  // Prüft, ob alle Felder (außer Telefon) ausgefüllt sind
   const isAnyFieldEmpty = allInputs.some(input => !input.value.trim() && input.id !== 'user-phone');
   if (isAnyFieldEmpty) {
     alert('Bitte fülle alle Pflichtfelder aus! (Telefon ist optional)');
@@ -47,7 +46,7 @@ generateBtn.addEventListener('click', async () => {
   downloadPdfBtn.classList.add('hidden');
 
   try {
-    const response = await fetch('/.netlify/functions/generate', {
+    const response = await fetch('/.netlify/functions/generate', { // Angepasst für Netlify
       method: 'POST',
       headers: { 'Content-Type': 'application/json', },
       body: JSON.stringify({ skills, experience, jobDescription }),
@@ -88,7 +87,6 @@ downloadPdfBtn.addEventListener('click', () => {
         hobbies: cvHobbies.value
     };
 
-    // Das Bild aus dem Input-Feld lesen
     const photoFile = cvPhotoInput.files[0];
     if (photoFile) {
         const reader = new FileReader();
@@ -98,7 +96,6 @@ downloadPdfBtn.addEventListener('click', () => {
         };
         reader.readAsDataURL(photoFile);
     } else {
-        // Wenn kein Bild ausgewählt wurde, rufen wir die Funktion ohne Bild auf
         generatePDF(sender, recipient, subject, bodyText, cvData, null);
     }
 });
@@ -132,6 +129,7 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
     doc.addPage();
     let yPos = 25;
 
+    // KORRIGIERTE Logik: Zeichne Sektionen ohne das Foto zu beeinträchtigen
     function drawSection(title, content) {
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
@@ -161,7 +159,20 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
     yPos += 15;
 
     const personalDataContent = `Name: ${sender.name}\nAnschrift: ${sender.address}, ${sender.city}\nE-Mail: ${sender.email}\nTelefon: ${sender.phone}`;
-    drawSection('Zur Person', personalDataContent);
+    
+    // Position für "Zur Person" anpassen, wenn ein Foto da ist, um die Linie zu verschieben
+    const personalDataYStart = yPos;
+    let textX = 20;
+    if (photoDataUrl) {
+        const personalDataLines = doc.splitTextToSize(personalDataContent, 120); // Weniger Platz in der Breite
+        drawSection('Zur Person', ''); // Zeichne nur den Titel und die Linie
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.text(personalDataLines, textX, yPos);
+        yPos += (personalDataLines.length * 5) + 12;
+    } else {
+        drawSection('Zur Person', personalDataContent);
+    }
 
     if (photoDataUrl && yPos < 80) {
         yPos = 80;
