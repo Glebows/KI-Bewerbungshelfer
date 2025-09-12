@@ -30,7 +30,6 @@ generateBtn.addEventListener('click', async () => {
       cvEducation, cvSkills, cvHobbies
   ];
   
-  // Prüft, ob alle Felder (außer Telefon) ausgefüllt sind
   const isAnyFieldEmpty = allInputs.some(input => !input.value.trim() && input.id !== 'user-phone');
   if (isAnyFieldEmpty) {
     alert('Bitte fülle alle Pflichtfelder aus! (Telefon ist optional)');
@@ -88,7 +87,6 @@ downloadPdfBtn.addEventListener('click', () => {
         hobbies: cvHobbies.value
     };
 
-    // Das Bild aus dem Input-Feld lesen
     const photoFile = cvPhotoInput.files[0];
     if (photoFile) {
         const reader = new FileReader();
@@ -98,7 +96,6 @@ downloadPdfBtn.addEventListener('click', () => {
         };
         reader.readAsDataURL(photoFile);
     } else {
-        // Wenn kein Bild ausgewählt wurde, rufen wir die Funktion ohne Bild auf
         generatePDF(sender, recipient, subject, bodyText, cvData, null);
     }
 });
@@ -148,8 +145,8 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
     }
 
     if (photoDataUrl) {
-        const photoWidth = 35;
-        const photoHeight = 45;
+        const photoWidth = 40;
+        const photoHeight = 50;
         const photoX = 210 - 20 - photoWidth;
         const photoY = yPos;
         doc.addImage(photoDataUrl, 'JPEG', photoX, photoY, photoWidth, photoHeight);
@@ -160,11 +157,37 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
     doc.text('Lebenslauf', 20, yPos);
     yPos += 15;
 
-    const personalDataContent = `Name: ${sender.name}\nAnschrift: ${sender.address}, ${sender.city}\nE-Mail: ${sender.email}\nTelefon: ${sender.phone}`;
-    drawSection('Zur Person', personalDataContent);
+    const personalDataContent = `Name:\nAnschrift:\n\nE-Mail:\nTelefon:`;
+    const personalDataValues = `${sender.name}\n${sender.address}\n${sender.city}\n${sender.email}\n${sender.phone}`;
+    
+    // Temporär Y-Position speichern für die Linie
+    const titleYPos = yPos;
+    yPos += 12; // Platz für Titel + Linie
 
-    if (photoDataUrl && yPos < 80) {
-        yPos = 80;
+    // Text zeichnen
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text(personalDataContent, 20, yPos);
+    doc.setFont('Helvetica', 'normal');
+    doc.text(personalDataValues, 50, yPos);
+
+    const personalDataLines = doc.splitTextToSize(personalDataValues, 120);
+    const textBlockHeight = (personalDataLines.length * 5);
+    
+    // Zeichne Titel und Linie an der alten Position
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('Zur Person', 20, titleYPos);
+    doc.setLineWidth(0.5);
+    doc.line(20, titleYPos + 2, 210 - 20, titleYPos + 2);
+    
+    // Setze Y-Position nach dem Textblock
+    yPos += textBlockHeight + 12;
+
+    // Passe die Y-Position an, falls das Foto höher ist
+    const photoBlockHeight = 50;
+    if (photoDataUrl && yPos < (photoY + photoBlockHeight + 12)) {
+        yPos = photoY + photoBlockHeight + 12;
     }
 
     drawSection('Schulbildung', cvData.education);

@@ -59,7 +59,6 @@ header p {
     .input-section .card {
         margin-bottom: 0;
     }
-    /* Sorge dafür, dass die letzten drei Karten die volle Breite einnehmen */
     .input-section .card:nth-last-child(-n+3) {
         grid-column: 1 / -1;
     }
@@ -233,7 +232,7 @@ input[type="tel"]:focus {
 .cv-section textarea {
     margin-bottom: 5px;
 }
-/* NEU: Styling für das Datei-Input-Feld */
+
 input[type="file"] {
     width: 100%;
     padding: 10px;
@@ -245,7 +244,6 @@ input[type="file"] {
     cursor: pointer;
 }
 
-/* Versteckt den unschönen Standard-Button-Text */
 input[type="file"]::file-selector-button {
     display: none;
 }
