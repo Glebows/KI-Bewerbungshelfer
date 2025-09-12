@@ -60,7 +60,6 @@
                     <h2>Schritt 5: Dein Lebenslauf</h2>
                     <label for="cv-photo">Bewerbungsfoto (optional)</label>
                     <input type="file" id="cv-photo" accept="image/png, image/jpeg">
-
                     <label for="cv-education">Schulbildung:</label>
                     <textarea id="cv-education" rows="3" placeholder="z.B. 2023 - heute: Schul- und Leistungssportzentrum Berlin..."></textarea>
                     <label for="cv-skills">Interessen & Kenntnisse:</label>
@@ -71,15 +70,25 @@
             </div>
 
             <div class="action-section">
-                <button id="generate-btn"><i class="fas fa-magic"></i> Unterlagen generieren</button>
+                <button id="generate-btn"><i class="fas fa-magic"></i> Anschreiben generieren</button>
             </div>
 
             <div class="output-section">
                 <section class="card result-card">
-                    <h2>Ergebnis: Anschreiben-Text</h2>
+                    <h2>Schritt 6: Finale Prüfung & Bearbeitung</h2>
+                    <p class="edit-info">Der KI-Text wurde generiert. Du kannst jetzt das Anschreiben hier und die Lebenslauf-Daten oben direkt bearbeiten, bevor du das PDF herunterlädst.</p>
                     <div id="result-text" class="result-text" contenteditable="true" spellcheck="false">
                         <p class="placeholder">Dein Anschreiben wird hier erscheinen...</p>
                     </div>
+
+                    <div id="template-section" class="template-section hidden">
+                        <h3>PDF-Design auswählen</h3>
+                        <div class="template-selector">
+                            <button class="template-btn active" data-template="modern">Modern</button>
+                            <button class="template-btn" data-template="classic">Klassisch</button>
+                        </div>
+                    </div>
+                    
                     <div class="result-actions">
                         <button id="copy-btn" title="Text kopieren"><i class="fas fa-copy"></i></button>
                         <button id="download-pdf-btn" class="hidden"><i class="fas fa-file-pdf"></i> PDF herunterladen</button>

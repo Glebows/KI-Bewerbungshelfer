@@ -247,3 +247,51 @@ input[type="file"] {
 input[type="file"]::file-selector-button {
     display: none;
 }
+
+.edit-info {
+    font-size: 0.9rem;
+    color: var(--label-color);
+    margin-bottom: 15px;
+    text-align: left;
+    border-left: 3px solid var(--primary-color);
+    padding-left: 10px;
+}
+
+.template-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.template-section h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--label-color);
+    margin: 0 0 10px 0;
+    text-align: center;
+}
+
+.template-selector {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.template-btn {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.template-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    font-weight: 500;
+}
