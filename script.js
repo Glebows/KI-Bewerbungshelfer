@@ -101,7 +101,7 @@ downloadPdfBtn.addEventListener('click', () => {
 });
 
 
-// === Die 2-Seiten-PDF-Funktion ===
+// === Die 2-Seiten-PDF-Funktion (MIT KORREKTUR FÜR DIE LINIE) ===
 function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
@@ -129,12 +129,13 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
     doc.addPage();
     let yPos = 25;
 
+    // Helfer-Funktion zum Zeichnen einer Sektion
     function drawSection(title, content) {
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
         doc.text(title, 20, yPos);
         doc.setLineWidth(0.5);
-        doc.line(20, yPos + 2, 210 - 20, yPos + 2);
+        doc.line(20, yPos + 2, 210 - 20, yPos + 2); // Linie unter dem Titel
         yPos += 12;
         
         doc.setFont('Helvetica', 'normal');
@@ -144,48 +145,49 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
         yPos += (contentLines.length * 5) + 12;
     }
 
-    const photoWidth = 40;
-    const photoHeight = 50;
-    const photoX = 210 - 20 - photoWidth;
-    const photoY = yPos;
-
-    if (photoDataUrl) {
-        doc.addImage(photoDataUrl, 'JPEG', photoX, photoY, photoWidth, photoHeight);
-    }
-    
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(18);
     doc.text('Lebenslauf', 20, yPos);
     yPos += 15;
+    
+    // Position des Fotos und des "Zur Person"-Blocks definieren
+    const photoWidth = 40;
+    const photoHeight = 50;
+    const photoX = 210 - 20 - photoWidth;
+    const photoY = yPos;
+    
+    // Zeichne den Titel und die Linie für "Zur Person"
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('Zur Person', 20, yPos);
+    doc.setLineWidth(0.5);
+    doc.line(20, yPos + 2, 210 - 20, yPos + 2);
+    yPos += 12;
 
+    // Zeichne das Foto, wenn es existiert
+    if (photoDataUrl) {
+        doc.addImage(photoDataUrl, 'JPEG', photoX, photoY, photoWidth, photoHeight);
+    }
+    
+    // Zeichne die persönlichen Daten
     const personalDataContent = `Name:\nAnschrift:\n\nE-Mail:\nTelefon:`;
     const personalDataValues = `${sender.name}\n${sender.address}\n${sender.city}\n${sender.email}\n${sender.phone}`;
-    
-    const titleYPos = yPos;
-    yPos += 12;
+    const textWidth = photoDataUrl ? 120 : 170; // Textbreite anpassen, wenn Foto da ist
 
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(11);
     doc.text(personalDataContent, 20, yPos);
     doc.setFont('Helvetica', 'normal');
-    doc.text(personalDataValues, 50, yPos);
+    const textLines = doc.splitTextToSize(personalDataValues, textWidth);
+    doc.text(textLines, 50, yPos);
 
-    const personalDataLines = doc.splitTextToSize(personalDataValues, 120);
-    const textBlockHeight = (personalDataLines.length * 5);
-    
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.text('Zur Person', 20, titleYPos);
-    doc.setLineWidth(0.5);
-    doc.line(20, titleYPos + 2, 210 - 20, titleYPos + 2);
-    
-    yPos += textBlockHeight + 12;
+    // Berechne die Endposition basierend auf dem Foto oder dem Text
+    const textBlockEndY = yPos + (textLines.length * 5);
+    const photoBlockEndY = photoDataUrl ? photoY + photoHeight : yPos;
+    yPos = Math.max(textBlockEndY, photoBlockEndY) + 15;
 
-    const photoBlockHeight = 50;
-    if (photoDataUrl && yPos < (photoY + photoBlockHeight + 12)) {
-        yPos = photoY + photoBlockHeight + 12;
-    }
 
+    // Zeichne die restlichen Sektionen
     drawSection('Schulbildung', cvData.education);
     drawSection('Interessen & Kenntnisse', cvData.skills);
     drawSection('Hobbys & Engagement', cvData.hobbies);
