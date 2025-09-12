@@ -144,11 +144,12 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
         yPos += (contentLines.length * 5) + 12;
     }
 
+    const photoWidth = 40;
+    const photoHeight = 50;
+    const photoX = 210 - 20 - photoWidth;
+    const photoY = yPos;
+
     if (photoDataUrl) {
-        const photoWidth = 40;
-        const photoHeight = 50;
-        const photoX = 210 - 20 - photoWidth;
-        const photoY = yPos;
         doc.addImage(photoDataUrl, 'JPEG', photoX, photoY, photoWidth, photoHeight);
     }
     
@@ -160,11 +161,9 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
     const personalDataContent = `Name:\nAnschrift:\n\nE-Mail:\nTelefon:`;
     const personalDataValues = `${sender.name}\n${sender.address}\n${sender.city}\n${sender.email}\n${sender.phone}`;
     
-    // Temporär Y-Position speichern für die Linie
     const titleYPos = yPos;
-    yPos += 12; // Platz für Titel + Linie
+    yPos += 12;
 
-    // Text zeichnen
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(11);
     doc.text(personalDataContent, 20, yPos);
@@ -174,17 +173,14 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
     const personalDataLines = doc.splitTextToSize(personalDataValues, 120);
     const textBlockHeight = (personalDataLines.length * 5);
     
-    // Zeichne Titel und Linie an der alten Position
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(14);
     doc.text('Zur Person', 20, titleYPos);
     doc.setLineWidth(0.5);
     doc.line(20, titleYPos + 2, 210 - 20, titleYPos + 2);
     
-    // Setze Y-Position nach dem Textblock
     yPos += textBlockHeight + 12;
 
-    // Passe die Y-Position an, falls das Foto höher ist
     const photoBlockHeight = 50;
     if (photoDataUrl && yPos < (photoY + photoBlockHeight + 12)) {
         yPos = photoY + photoBlockHeight + 12;
