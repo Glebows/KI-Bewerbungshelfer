@@ -26,7 +26,7 @@ const cvHobbies = document.getElementById('cv-hobbies');
 generateBtn.addEventListener('click', async () => {
   const allInputs = [
       skillsInput, experienceInput, jobInput, userName,
-      userAddress, userCity, userEmail, companyName, companyAddress, companyCity,
+      userAddress, userCity, userEmail, companyName, companyAddress, company-city,
       cvEducation, cvSkills, cvHobbies
   ];
   
@@ -46,7 +46,7 @@ generateBtn.addEventListener('click', async () => {
   downloadPdfBtn.classList.add('hidden');
 
   try {
-    const response = await fetch('/.netlify/functions/generate', { // Angepasst für Netlify
+    const response = await fetch('/.netlify/functions/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', },
       body: JSON.stringify({ skills, experience, jobDescription }),
@@ -129,8 +129,8 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
     doc.addPage();
     let yPos = 25;
 
-    // KORRIGIERTE Logik: Zeichne Sektionen ohne das Foto zu beeinträchtigen
-    function drawSection(title, content) {
+    // KORRIGIERTE Logik, um die Linie korrekt zu platzieren
+    function drawSection(title, content, contentX = 20) {
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
         doc.text(title, 20, yPos);
@@ -141,42 +141,40 @@ function generatePDF(sender, recipient, subject, bodyText, cvData, photoDataUrl)
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(11);
         const contentLines = doc.splitTextToSize(content, 170);
-        doc.text(contentLines, 20, yPos);
+        doc.text(contentLines, contentX, yPos);
         yPos += (contentLines.length * 5) + 12;
     }
 
-    if (photoDataUrl) {
-        const photoWidth = 35;
-        const photoHeight = 45;
-        const photoX = 210 - 20 - photoWidth;
-        const photoY = yPos;
-        doc.addImage(photoDataUrl, 'JPEG', photoX, photoY, photoWidth, photoHeight);
-    }
-    
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(18);
     doc.text('Lebenslauf', 20, yPos);
     yPos += 15;
 
-    const personalDataContent = `Name: ${sender.name}\nAnschrift: ${sender.address}, ${sender.city}\nE-Mail: ${sender.email}\nTelefon: ${sender.phone}`;
-    
-    // Position für "Zur Person" anpassen, wenn ein Foto da ist, um die Linie zu verschieben
-    const personalDataYStart = yPos;
-    let textX = 20;
-    if (photoDataUrl) {
-        const personalDataLines = doc.splitTextToSize(personalDataContent, 120); // Weniger Platz in der Breite
-        drawSection('Zur Person', ''); // Zeichne nur den Titel und die Linie
-        doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(11);
-        doc.text(personalDataLines, textX, yPos);
-        yPos += (personalDataLines.length * 5) + 12;
-    } else {
-        drawSection('Zur Person', personalDataContent);
-    }
+    const photoWidth = 40;
+    const photoHeight = 50;
+    const photoX = 210 - 20 - photoWidth;
+    const photoY = yPos;
 
-    if (photoDataUrl && yPos < 80) {
-        yPos = 80;
+    if (photoDataUrl) {
+        doc.addImage(photoDataUrl, 'JPEG', photoX, photoY, photoWidth, photoHeight);
     }
+    
+    // Persönliche Daten
+    const personalDataContent = `Name:\nAnschrift:\n\nE-Mail:\nTelefon:`;
+    const personalDataValues = `${sender.name}\n${sender.address}\n${sender.city}\n${sender.email}\n${sender.phone}`;
+    
+    drawSection('Zur Person', '');
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text(personalDataContent, 20, yPos - 7);
+    doc.setFont('Helvetica', 'normal');
+    doc.text(personalDataValues, 50, yPos - 7);
+
+    // Passe die Y-Position an, falls das Foto höher ist als der Textblock
+    const personalDataBlockHeight = 35;
+    yPos += Math.max(0, (photoDataUrl ? photoHeight - personalDataBlockHeight : 0));
+    yPos += 12;
+
 
     drawSection('Schulbildung', cvData.education);
     drawSection('Interessen & Kenntnisse', cvData.skills);
