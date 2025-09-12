@@ -157,60 +157,73 @@ function drawModernLayout(doc, sender, recipient, subject, bodyText, cvData, pho
 
     // SEITE 2: LEBENSLAUF
     doc.addPage();
-    let yPos = 25;
+    let yPos = 25; // Startposition für den Lebenslauf
 
-    function drawSection(title, content) {
+    // Hilfsfunktion zum Zeichnen einer Sektion mit Titel und Linie
+    function drawSection(title, content, startY) {
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
-        doc.text(title, 20, yPos);
+        doc.text(title, 20, startY);
         doc.setLineWidth(0.5);
-        doc.line(20, yPos + 2, 210 - 20, yPos + 2);
-        yPos += 12;
+        doc.line(20, startY + 2, 210 - 20, startY + 2); // Linie unter dem Titel
+        startY += 12; // Abstand nach Titel und Linie
+        
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(11);
         const contentLines = doc.splitTextToSize(content, 170);
-        doc.text(contentLines, 20, yPos);
-        yPos += (contentLines.length * 5) + 12;
+        doc.text(contentLines, 20, startY);
+        return startY + (contentLines.length * 5) + 12; // Neue y-Position
     }
 
-    if (photoDataUrl) {
-        doc.addImage(photoDataUrl, 'JPEG', 210 - 20 - 40, yPos, 40, 50);
-    }
-    
+    const photoWidth = 40;
+    const photoHeight = 50;
+    const photoX = 210 - 20 - photoWidth; // 20mm Rand rechts
+    let personalDataStartX = 20; // Standard Startpunkt für persönliche Daten
+
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(18);
     doc.text('Lebenslauf', 20, yPos);
-    yPos += 15;
+    yPos += 15; // Abstand nach "Lebenslauf" Titel
 
-    const personalDataContent = `Name:\nAnschrift:\n\nE-Mail:\nTelefon:`;
-    const personalDataValues = `${sender.name}\n${sender.address}\n${sender.city}\n${sender.email}\n${sender.phone}`;
-    const titleYPos = yPos;
-    yPos += 12;
-
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text(personalDataContent, 20, yPos);
-    doc.setFont('Helvetica', 'normal');
-    doc.text(personalDataValues, 50, yPos);
-
-    const personalDataLines = doc.splitTextToSize(personalDataValues, 120);
-    const textBlockHeight = (personalDataLines.length * 5);
-    
+    // --- "Zur Person" Sektion ---
+    let zurPersonTitleY = yPos;
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(14);
-    doc.text('Zur Person', 20, titleYPos);
+    doc.text('Zur Person', 20, zurPersonTitleY);
     doc.setLineWidth(0.5);
-    doc.line(20, titleYPos + 2, 210 - 20, titleYPos + 2);
-    
-    yPos += textBlockHeight + 12;
+    doc.line(20, zurPersonTitleY + 2, 210 - 20, zurPersonTitleY + 2); // Linie unter "Zur Person"
+    yPos = zurPersonTitleY + 12; // Neue y-Position nach dem Titel "Zur Person"
 
-    if (photoDataUrl && yPos < (25 + 50 + 12)) {
-        yPos = 25 + 50 + 12;
+    // Füge das Foto ein, wenn vorhanden
+    if (photoDataUrl) {
+        doc.addImage(photoDataUrl, 'JPEG', photoX, yPos, photoWidth, photoHeight);
+        // Wenn ein Foto da ist, beginnen die persönlichen Daten weiter links, um Platz zu sparen
+        personalDataStartX = 20; 
+        // yPos für den nachfolgenden Text muss unter dem Foto liegen
+        // oder auf der aktuellen yPos bleiben, je nachdem was tiefer ist
     }
+    
+    // Persönliche Daten
+    const personalDataContent = `Name:\nAnschrift:\n\nE-Mail:\nTelefon:`;
+    const personalDataValues = `${sender.name}\n${sender.address}\n${sender.city}\n${sender.email}\n${sender.phone}`;
+    
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text(personalDataContent, personalDataStartX, yPos);
+    doc.setFont('Helvetica', 'normal');
+    doc.text(personalDataValues, personalDataStartX + 30, yPos); // Werte 30mm weiter rechts vom Titel
 
-    drawSection('Schulbildung', cvData.education);
-    drawSection('Interessen & Kenntnisse', cvData.skills);
-    drawSection('Hobbys & Engagement', cvData.hobbies);
+    const personalDataLines = doc.splitTextToSize(personalDataValues, photoDataUrl ? (photoX - personalDataStartX - 35) : 170); // Textbreite anpassen
+    let currentBlockEndY = yPos + (personalDataLines.length * 5); // Endposition des Textblocks
+
+    // Stellen Sie sicher, dass der nächste Abschnitt nach dem Foto (falls vorhanden) beginnt
+    const photoBlockEndY = photoDataUrl ? yPos + photoHeight : 0;
+    yPos = Math.max(currentBlockEndY, photoBlockEndY) + 15; // Mindestens 15mm Abstand
+
+    // Weitere Sektionen zeichnen
+    yPos = drawSection('Schulbildung', cvData.education, yPos);
+    yPos = drawSection('Interessen & Kenntnisse', cvData.skills, yPos);
+    yPos = drawSection('Hobbys & Engagement', cvData.hobbies, yPos);
 }
 
 
